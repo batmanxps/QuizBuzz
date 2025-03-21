@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - QuizBuzz</title>
+  <link rel="stylesheet" href="/styles/output.css">
+  <style>
+    body {
+      background-color: #fafafa;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    input:focus {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+      outline: none;
+    }
+
+    footer {
+      text-align: center;
+      width: 100%;
+      padding: 10px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="bg-white p-8 rounded-lg shadow-md w-96 text-center">
+      <h1 class="text-3xl font-bold mb-1">QuizBuzz</h1>
+      <p class="text-gray-500 text-sm mb-6">by Adhyayan Classes</p>
+
+      <% if (messages.error && messages.error.length> 0) { %>
+        <div class="bg-red-500/20 border border-red-500 text-red-500 p-2 rounded-lg text-sm m-2">
+          <%= messages.error %>
+        </div>
+      <% } %>
+
+      <form id="loginForm" method="post" action="/auth/login">
+        <div class="mb-4">
+          <input type="text" id="loginEmail" placeholder="Enter your email or username"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" name="usernameOrEmail">
+          <p id="loginEmailError" class="text-red-500 text-sm mt-1 hidden">Invalid email or username</p>
+        </div>
+
+        <div class="mb-4 relative">
+          <input type="password" id="loginPassword" placeholder="Enter your password"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" name="password">
+          <button id="toggleLoginPassword" class="absolute inset-y-0 right-0 px-4 py-2 text-gray-600">Show</button>
+          <p id="loginPasswordError" class="text-red-500 text-sm mt-1 hidden">Invalid password</p>
+        </div>
+
+        <a href="#" class="text-blue-500 text-sm block mb-4">Forgot password?</a>
+
+        <button type="submit"
+          class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300">Login</button>
+      </form>
+
+      <p class="text-gray-600 mt-4">Don't have an account? <a href="/auth/signup" class="text-blue-500">Sign Up</a></p>
+    </div>
+  </div>
+
+  <footer onclick="location.href='https://www.instagram.com/pushkar_ps_/'" class="text-gray-500 text-sm">
+    Developed by <span class="font-bold text-blue-600">Pushkar Ps</span>
+  </footer>
+
+  <script>
+    function togglePasswordVisibility(inputId, toggleId) {
+      const passwordInput = document.getElementById(inputId);
+      const toggleButton = document.getElementById(toggleId);
+
+      if (passwordInput && toggleButton) {
+        toggleButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+          passwordInput.setAttribute('type', type);
+          toggleButton.textContent = type === 'password' ? 'Show' : 'Hide';
+        });
+      }
+    }
+
+    togglePasswordVisibility('loginPassword', 'toggleLoginPassword');
+
+    const loginForm = document.getElementById('loginForm');
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const emailOrUsername = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      document.getElementById('loginEmailError').classList.add('hidden');
+      document.getElementById('loginPasswordError').classList.add('hidden');
+      let isValid = true;
+      if (!emailOrUsername) {
+        document.getElementById('loginEmailError').classList.remove('hidden');
+        isValid = false;
+      }
+      if (!password || password.length < 6) {
+        document.getElementById('loginPasswordError').classList.remove('hidden');
+        isValid = false;
+      }
+      if (isValid) {
+        loginForm.submit();
+      }
+    });
+  </script>
+</body>
+
+</html>

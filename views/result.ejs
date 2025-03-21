@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results - QuizBuzz</title>
+    <link rel="stylesheet" href="/styles/output.css">
+    <style>
+        .result-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <div class="min-h-screen flex flex-col items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md result-card">
+            <h2 class="text-2xl font-bold mb-6 text-blue-600 text-center">Quiz Results</h2>
+
+            <div class="flex justify-between items-center mb-4">
+                <p class="text-lg">Total Score:</p>
+                <p class="text-lg font-bold text-blue-700" id="totalScore">0</p>
+            </div>
+
+            <div class="flex justify-between items-center mb-4">
+                <p class="text-lg">Correct Answers:</p>
+                <p class="text-lg font-bold text-green-600" id="correctAnswers">0</p>
+            </div>
+
+            <div class="flex justify-between items-center mb-4">
+                <p class="text-lg">Wrong Answers:</p>
+                <p class="text-lg font-bold text-red-600" id="wrongAnswers">0</p>
+            </div>
+
+            <div class="flex justify-between items-center mb-6">
+                <p class="text-lg">Time Taken:</p>
+                <p class="text-lg font-bold text-blue-600" id="timeTaken">00:00</p>
+            </div>
+
+            <a href="/"
+                class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition duration-300 text-center block mb-3">Play
+                Again</a>
+            <a href="/leaderboard"
+                class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300 text-center block">View
+                Leaderboard</a>
+        </div>
+    </div>
+
+    <script>
+        // Get quiz ID from URL
+        const quizId = window.location.pathname.split("/")[2];
+
+        // Fetch stored quiz results from localStorage
+        const results = JSON.parse(localStorage.getItem("quizResults"));
+
+        if (results && quizId) {
+            document.getElementById("totalScore").textContent = results.score;
+            document.getElementById("correctAnswers").textContent = results.correctAnswers;
+            document.getElementById("wrongAnswers").textContent = results.wrongAnswers;
+
+            let minutes = Math.floor(results.totalTimeTaken / 60);
+            let seconds = results.totalTimeTaken % 60;
+            document.getElementById("timeTaken").textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+            // Send results to backend
+            fetch("/submit-result", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify({
+                    quizId: quizId,  // Now we get quiz ID from URL
+                    score: results.score,
+                    correctAnswers: results.correctAnswers,
+                    wrongAnswers: results.wrongAnswers,
+                    totalTimeTaken: results.totalTimeTaken
+                })
+            });
+        } else {
+            console.error("❌ Missing quiz results or quiz ID, result submission aborted.");
+        }
+    </script>
+</body>
+
+</html>

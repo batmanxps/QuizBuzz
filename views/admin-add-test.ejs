@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Quiz | QuizBuzz</title>
+  <link rel="stylesheet" href="/styles/output.css">
+  <script>
+    let questions = [];
+
+    function addQuestion() {
+      const questionInput = document.getElementById("question");
+      const option1 = document.getElementById("option1");
+      const option2 = document.getElementById("option2");
+      const option3 = document.getElementById("option3");
+      const option4 = document.getElementById("option4");
+      const correctAnswer = document.getElementById("correctAnswer");
+
+      const questionText = questionInput.value.trim();
+      const options = [
+        option1.value.trim(),
+        option2.value.trim(),
+        option3.value.trim(),
+        option4.value.trim()
+      ];
+      const correctAnsIndex = parseInt(correctAnswer.value); // Ensure it's a number
+
+      if (!questionText || options.some(opt => opt === "")) {
+        alert("Please fill in all fields before adding the question.");
+        return;
+      }
+
+      const questionObj = { question: questionText, options: options, ans: correctAnsIndex };
+      questions.push(questionObj);
+      renderQuestions();
+
+      // ✅ Clear input fields after adding the question
+      questionInput.value = "";
+      option1.value = "";
+      option2.value = "";
+      option3.value = "";
+      option4.value = "";
+      correctAnswer.value = "0"; // Reset to the first option
+    }
+
+    function renderQuestions() {
+      const questionContainer = document.getElementById("added-questions");
+      questionContainer.innerHTML = "";
+
+      questions.forEach((q, index) => {
+        const questionBlock = document.createElement("div");
+        questionBlock.classList.add("question-block", "p-4", "border", "rounded-lg", "mb-4", "bg-white");
+
+        questionBlock.innerHTML = `
+          <p class="text-lg font-semibold">${index + 1}. ${q.question}</p>
+          <ul class="list-disc ml-6">
+            ${q.options.map((opt, i) => `<li>${opt} ${i === q.ans ? "(✔ Correct)" : ""}</li>`).join("")}
+          </ul>
+          <button type="button" onclick="editQuestion(${index})" class="bg-yellow-500 text-white px-2 py-1 rounded mt-2">Edit</button>
+          <button type="button" onclick="removeQuestion(${index})" class="bg-red-500 text-white px-2 py-1 rounded mt-2 ml-2">Remove</button>
+        `;
+
+        questionContainer.appendChild(questionBlock);
+      });
+    }
+
+    function editQuestion(index) {
+      const q = questions[index];
+
+      document.getElementById("question").value = q.question;
+      document.getElementById("option1").value = q.options[0];
+      document.getElementById("option2").value = q.options[1];
+      document.getElementById("option3").value = q.options[2];
+      document.getElementById("option4").value = q.options[3];
+      document.getElementById("correctAnswer").value = q.ans;
+
+      questions.splice(index, 1);
+      renderQuestions();
+    }
+
+    function removeQuestion(index) {
+      questions.splice(index, 1);
+      renderQuestions();
+    }
+
+    function submitForm(event) {
+      event.preventDefault();
+
+      if (questions.length === 0) {
+        alert("Please add at least one question before submitting.");
+        return;
+      }
+
+      const startDate = document.getElementById("startDate").value;
+      const startTime = document.getElementById("startTime").value;
+      const endDate = document.getElementById("endDate").value;
+      const endTime = document.getElementById("endTime").value;
+
+      const startDateTime = `${startDate}T${startTime}`;
+      const endDateTime = `${endDate}T${endTime}`;
+
+      const formData = {
+        title: document.getElementById("title").value.trim(),
+        startTime: startDateTime,
+        endTime: endDateTime,
+        questions: questions
+      };
+
+      console.log("Submitting quiz data:", formData);
+
+      fetch("/admin/add-quiz", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log("Server Response:", data);
+          if (data.error) {
+            alert("Error: " + data.error);
+          } else {
+            alert("Quiz Added Successfully!");
+            window.location.href = "/admin/adminDashboard";
+          }
+        })
+        .catch(error => {
+          console.error("Fetch Error:", error);
+          alert("Failed to submit the quiz. Check console for details.");
+        });
+    }
+  </script>
+</head>
+
+<body class="bg-gray-100 p-6">
+  <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold text-center text-blue-600 mb-4">Create a New Quiz</h2>
+
+    <form id="quiz-form" onsubmit="submitForm(event)">
+      <label class="block text-lg font-semibold">Quiz Title:</label>
+      <input type="text" id="title" name="title" class="w-full p-2 border rounded mb-4" required>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-lg font-semibold">Start Date:</label>
+          <input type="date" id="startDate" class="w-full p-2 border rounded mb-4" required>
+        </div>
+        <div>
+          <label class="block text-lg font-semibold">Start Time:</label>
+          <input type="time" id="startTime" class="w-full p-2 border rounded mb-4" required>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-lg font-semibold">End Date:</label>
+          <input type="date" id="endDate" class="w-full p-2 border rounded mb-4" required>
+        </div>
+        <div>
+          <label class="block text-lg font-semibold">End Time:</label>
+          <input type="time" id="endTime" class="w-full p-2 border rounded mb-4" required>
+        </div>
+      </div>
+
+      <div id="question-form" class="mb-6">
+        <label class="block text-lg font-semibold">Question:</label>
+        <input type="text" id="question" class="w-full p-2 border rounded mb-2" required>
+
+        <label class="block text-lg font-semibold">Options:</label>
+        <input type="text" id="option1" class="w-full p-2 border rounded mb-2" placeholder="Option 1" required>
+        <input type="text" id="option2" class="w-full p-2 border rounded mb-2" placeholder="Option 2" required>
+        <input type="text" id="option3" class="w-full p-2 border rounded mb-2" placeholder="Option 3">
+        <input type="text" id="option4" class="w-full p-2 border rounded mb-2" placeholder="Option 4">
+
+        <label class="block text-lg font-semibold">Correct Answer:</label>
+        <select id="correctAnswer" class="w-full p-2 border rounded mb-4" required>
+          <option value="0">Option 1</option>
+          <option value="1">Option 2</option>
+          <option value="2">Option 3</option>
+          <option value="3">Option 4</option>
+        </select>
+
+        <button type="button" onclick="addQuestion()" class="bg-green-500 text-white px-4 py-2 rounded w-full">Add Question</button>
+      </div>
+
+      <h3 class="text-xl font-bold text-blue-600 mt-4">Added Questions:</h3>
+      <div id="added-questions" class="mt-2"></div>
+
+      <button type="submit" class="bg-blue-600 text-white w-full py-2 rounded-lg mt-4">Submit Quiz</button>
+    </form>
+  </div>
+</body>
+
+</html>

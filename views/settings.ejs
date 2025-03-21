@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - QuizBuzz</title>
+    <link rel="stylesheet" href="/styles/output.css">
+    <style>
+        /* Custom styles for confirmation popup */
+        .confirmation-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .confirmation-popup.active {
+            display: flex;
+        }
+
+        .confirmation-box {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <!-- Navigation Bar -->
+    <nav class="fixed top-0 left-0 w-full z-50 backdrop-filter backdrop-blur-lg bg-white/80 shadow-sm">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="https://adhyayan-classes.netlify.app/" class="flex items-center space-x-2">
+                <img src="https://media-bom2-2.cdn.whatsapp.net/v/t61.24694-24/328759618_478169478222632_103569350237823088_n.jpg?ccb=11-4&oh=01_Q5AaIeLpxd1s8E-SaghWmU-heid2CIu548Cnc2NL3LFB2qCG&oe=67E92CFE&_nc_sid=5e03e0&_nc_cat=109" alt="QuizBuzz Logo" class="h-12 rounded-full">
+              </a>
+            <!-- Back Button -->
+            <a href="/" class="text-blue-600 hover:text-blue-800"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                    height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left-to-line">
+                    <path d="M3 19V5" />
+                    <path d="m13 6-6 6 6 6" />
+                    <path d="M7 12h14" />
+                </svg></a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="min-h-screen flex flex-col items-center justify-center p-4 pt-20">
+        <!-- Settings Form -->
+        <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-6 text-blue-600">Settings</h2>
+
+            <!-- Update Username -->
+            <% if (messages.success && messages.success.length>0) { %>
+                <div class="bg-green-500/20 border border-green-500 text-green-500 p-2 rounded-lg text-sm m-2">
+                    <%= messages.success %>
+                </div>
+                <% } %>
+                    <form action="/<%= user.uid %>/Update" method="post">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Username</label>
+                            <input type="text" value="<%= user.username %>"
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                name="username">
+                        </div>
+
+                        <!-- Update Email -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" value="<%= user.email %>"
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                name="email">
+                        </div>
+
+                        <!-- Update Full Name -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Full Name</label>
+                            <input type="text" value="<%= user.fullName %>"
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                name="fullName">
+                        </div>
+
+                        <!-- Update Password -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700">Password</label>
+                            <input type="password" placeholder="Enter new password"
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                name="password">
+                        </div>
+
+                        <!-- Save Changes Button -->
+                        <button
+                            class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300 mb-4"
+                            type="submit">Save
+                            Changes</button>
+                    </form>
+
+                    <!-- Logout Button -->
+                    <button
+                        class="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition duration-300 mb-4"
+                        onclick="location.href='/logout'">Logout</button>
+
+                    <!-- Delete Account Button -->
+                    <button id="deleteAccountBtn"
+                        class="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition duration-300">Delete
+                        Account</button>
+        </div>
+    </div>
+
+    <!-- Confirmation Popup -->
+    <div id="confirmationPopup" class="confirmation-popup">
+        <div class="confirmation-box">
+            <h3 class="text-xl font-bold mb-4">Are you sure?</h3>
+            <p class="text-gray-600 mb-6">Deleting your account is permanent and cannot be recovered. All your data will
+                be lost.</p>
+            <div class="flex justify-center space-x-4">
+                <button id="confirmDeleteBtn"
+                    class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition duration-300"
+                    onclick="location.href='/<%= user._id%>/Delete'">Delete</button>
+                <button id="cancelDeleteBtn"
+                    class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition duration-300">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for Confirmation Popup
+        const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+        const confirmationPopup = document.getElementById('confirmationPopup');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+        // Show confirmation popup
+        deleteAccountBtn.addEventListener('click', () => {
+            confirmationPopup.classList.add('active');
+        });
+
+        // Cancel delete account
+        cancelDeleteBtn.addEventListener('click', () => {
+            confirmationPopup.classList.remove('active');
+        });
+        console.log("Developed By Pushkar Ps")
+    </script>
+</body>
+
+</html>

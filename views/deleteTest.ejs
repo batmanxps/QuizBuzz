@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delete Test - QuizBuzz</title>
+  <link rel="stylesheet" href="/styles/output.css">
+</head>
+<body class="bg-gray-100">
+  <div class="min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="flex items-center justify-center w-full max-w-4xl mb-6">
+      <a href="/admin/adminDashboard" class="text-blue-600 hover:text-blue-800">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 19V5" />
+          <path d="m13 6-6 6 6 6" />
+          <path d="M7 12h14" />
+        </svg>
+      </a>
+      <h2 class="text-2xl font-bold text-blue-600 text-center w-full">Delete Test</h2>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl">
+      <!-- Live Tests Section -->
+      <h3 class="text-xl font-bold text-blue-600 mb-4">Live Tests</h3>
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-blue-500 text-white">
+            <th class="p-3">Test Name</th>
+            <th class="p-3">Ends On</th>
+            <th class="p-3">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% liveQuizzes.forEach(quiz => { %>
+            <tr class="border-b">
+              <td class="p-3"><%= quiz.title %></td>
+              <td class="p-3"><%= new Date(quiz.endTime).toLocaleString() %></td>
+              <td class="p-3">
+                <button class="text-red-500 hover:text-red-700" onclick="confirmDelete('<%= quiz._id %>', '<%= quiz.title %>')">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+
+      <!-- Scheduled Tests Section -->
+      <h3 class="text-xl font-bold text-blue-600 mt-6 mb-4">Scheduled Tests</h3>
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-blue-500 text-white">
+            <th class="p-3">Test Name</th>
+            <th class="p-3">Starts In</th>
+            <th class="p-3">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% scheduledQuizzes.forEach(quiz => { %>
+            <tr class="border-b">
+              <td class="p-3"><%= quiz.title %></td>
+              <td class="p-3"><%= new Date(quiz.startTime).toLocaleString() %></td>
+              <td class="p-3">
+                <button class="text-red-500 hover:text-red-700" onclick="confirmDelete('<%= quiz._id %>', '<%= quiz.title %>')">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+
+      <!-- Previous Tests Section -->
+      <h3 class="text-xl font-bold text-blue-600 mt-6 mb-4">Previous Tests</h3>
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-blue-500 text-white">
+            <th class="p-3">Test Name</th>
+            <th class="p-3">Completed On</th>
+            <th class="p-3">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% previousQuizzes.forEach(quiz => { %>
+            <tr class="border-b">
+              <td class="p-3"><%= quiz.title %></td>
+              <td class="p-3"><%= new Date(quiz.endTime).toLocaleString() %></td>
+              <td class="p-3">
+                <button class="text-red-500 hover:text-red-700" onclick="confirmDelete('<%= quiz._id %>', '<%= quiz.title %>')">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Confirmation Popup -->
+  <div id="confirmationPopup" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg text-center max-w-sm">
+      <h3 class="text-xl font-bold mb-4">Are you sure?</h3>
+      <p id="deleteTestName" class="text-gray-600 mb-6"></p>
+      <div class="flex justify-center space-x-4">
+        <button id="confirmDeleteBtn" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600">Delete</button>
+        <button id="cancelDeleteBtn" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let deleteQuizId = '';
+
+    function confirmDelete(quizId, quizTitle) {
+      deleteQuizId = quizId;
+      document.getElementById('deleteTestName').innerText = "You are about to delete: " + quizTitle;
+      document.getElementById('confirmationPopup').classList.remove('hidden');
+    }
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+      fetch(`/admin/delete-quiz/${deleteQuizId}`, { method: "DELETE" })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert("Test deleted successfully!");
+            location.reload();
+          } else {
+            alert("Error: " + data.message);
+          }
+        })
+        .catch(error => {
+          console.error("Error deleting test:", error);
+          alert("Failed to delete the test.");
+        });
+
+      document.getElementById('confirmationPopup').classList.add('hidden');
+    });
+
+    document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+      document.getElementById('confirmationPopup').classList.add('hidden');
+    });
+  </script>
+</body>
+</html>

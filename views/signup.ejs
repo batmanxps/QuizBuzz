@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - QuizBuzz</title>
+    <link rel="stylesheet" href="/styles/output.css">
+    <style>
+        body {
+            background-color: #fafafa;
+        }
+
+        input:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+            outline: none;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #3b82f6;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen">
+    <!-- Sign-Up Page -->
+    <div class="bg-white p-8 rounded-lg shadow-md w-96 text-center">
+        <!-- Header -->
+        <h1 class="text-3xl font-bold mb-1">QuizBuzz</h1>
+        <p class="text-gray-500 text-sm mb-6">by Adhyayan Classes </p>
+
+        <!-- Progress Bar -->
+        <div class="mb-6">
+            <div class="progress-bar">
+                <div id="progressBarFill" class="progress-bar-fill" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <!-- Sign-Up Form -->
+        <% if (messages.error && messages.error.length> 0) { %>
+            <div class="bg-red-500/20 border border-red-500 text-red-500 p-2 rounded-lg text-sm m-2">
+                <%= messages.error %>
+            </div>
+            <% } %>
+                <form id="signUpForm" action="/auth/signup" method="post">
+                    <!-- Full Name -->
+                    <div class="mb-4">
+                        <input type="text" id="fullName" placeholder="Enter your full name"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" name="fullName">
+                        <p id="fullNameError" class="text-red-500 text-sm mt-1 hidden">Name must be at least 6
+                            characters</p>
+                    </div>
+
+                    <!-- Username -->
+                    <div class="mb-4">
+                        <input type="text" id="username" placeholder="Choose a username"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" name="username">
+                        <p id="usernameError" class="text-red-500 text-sm mt-1 hidden">Username must be at least 6
+                            characters
+                        </p>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-4">
+                        <input type="email" id="email" placeholder="Enter your email"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" name="email">
+                        <p id="emailError" class="text-red-500 text-sm mt-1 hidden">Please enter a valid email</p>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-4 relative">
+                        <input type="password" id="password" placeholder="Create a password"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" name="password">
+                        <button id="toggleSignUpPassword"
+                            class="absolute inset-y-0 right-0 px-4 py-2 text-gray-600">Show</button>
+                        <p id="passwordError" class="text-red-500 text-sm mt-1 hidden">Password must be at least 8
+                            characters
+                            with 1 number</p>
+                    </div>
+
+                    <!-- Terms & Conditions -->
+                    <div class="mb-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="terms" class="mr-2">
+                            <span class="text-sm">I have read the rules of <a href="https://adhyayan-classes.netlify.app/" class="text-blue-700">Adhyayan Classes</a> </span>
+                        </label>
+                        <p id="termError" class="text-red-500 text-sm mt-1 hidden">Please accept the terms and
+                            conditions</p>
+                    </div>
+
+                    <!-- Sign-Up Button -->
+                    <button type="submit"
+                        class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition duration-300">Sign
+                        Up</button>
+                </form>
+
+                <!-- Login Link -->
+                <p class="text-gray-600 mt-4">Already have an account? <a href="/auth/login"
+                        class="text-blue-500">Login</a></p>
+    </div>
+
+    <script>
+        // JavaScript for See Password Functionality
+        function togglePasswordVisibility(inputId, toggleId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleButton = document.getElementById(toggleId);
+
+            if (passwordInput && toggleButton) {
+                toggleButton.addEventListener('click', (e) => {
+                    e.preventDefault(); // Prevent form submission
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+
+                    // Update button text
+                    toggleButton.textContent = type === 'password' ? 'Show' : 'Hide';
+                });
+            }
+        }
+
+        // Add toggle functionality to Sign-Up Page
+        togglePasswordVisibility('password', 'toggleSignUpPassword');
+
+        // JavaScript for Progress Bar
+        const progressBarFill = document.getElementById('progressBarFill');
+        const formFields = ['fullName', 'username', 'email', 'password', 'terms'];
+
+        function updateProgressBar() {
+            let completedFields = 0;
+            formFields.forEach((field) => {
+                const input = document.getElementById(field);
+                if (input.type === 'checkbox') {
+                    if (input.checked) completedFields++;
+                } else {
+                    if (input.value.trim() !== '') completedFields++;
+                }
+            });
+            const progress = (completedFields / formFields.length) * 100;
+            progressBarFill.style.width = `${progress}%`;
+        }
+
+        // Attach event listeners to form fields
+        formFields.forEach((field) => {
+            const input = document.getElementById(field);
+            input.addEventListener('input', updateProgressBar);
+            if (input.type === 'checkbox') {
+                input.addEventListener('change', updateProgressBar);
+            }
+        });
+
+        const signUpForm = document.getElementById('signUpForm');
+        signUpForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // Prevent form submission initially
+            const fullName = document.getElementById('fullName').value;
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const terms = document.getElementById('terms').checked;
+
+            // Validation
+            let formIsValid = true;
+
+            if (fullName.length < 6) {
+                document.getElementById('fullNameError').classList.remove('hidden');
+                formIsValid = false;
+            } else {
+                document.getElementById('fullNameError').classList.add('hidden');
+            }
+
+            if (username.length < 6) {
+                document.getElementById('usernameError').classList.remove('hidden');
+                formIsValid = false;
+            } else {
+                document.getElementById('usernameError').classList.add('hidden');
+            }
+
+            if (!email.includes('@')) {
+                document.getElementById('emailError').classList.remove('hidden');
+                formIsValid = false;
+            } else {
+                document.getElementById('emailError').classList.add('hidden');
+            }
+
+            if (password.length < 8 || !/[0-9]/.test(password)) {
+                document.getElementById('passwordError').classList.remove('hidden');
+                formIsValid = false;
+            } else {
+                document.getElementById('passwordError').classList.add('hidden');
+            }
+
+            if (!terms) {
+                document.getElementById('termError').classList.remove('hidden');
+                formIsValid = false;
+            } else {
+                document.getElementById('termError').classList.add('hidden');
+            }
+
+            // If all fields are valid, submit the form
+            if (formIsValid) {
+                signUpForm.submit(); // Submit the form if everything is valid
+            }
+        });
+
+    </script>
+</body>
+
+</html>

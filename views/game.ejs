@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game - QuizBuzz</title>
+    <link rel="stylesheet" href="/styles/output.css">
+    <style>
+        /* Timer Styles */
+        .timer {
+            font-family: monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+
+        /* Option Styles */
+        .option {
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .option:hover {
+            background-color: #f3f4f6;
+        }
+
+        .correct {
+            background-color: #34d399 !important;
+        }
+
+        /* Green */
+        .wrong {
+            background-color: #ef4444 !important;
+        }
+
+        /* Red */
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <!-- Game Container -->
+    <div class="min-h-screen flex flex-col items-center justify-center p-4">
+        <!-- Header -->
+        <div class="w-full max-w-md bg-white p-4 rounded-lg shadow-md mb-6">
+            <div class="flex justify-between items-center">
+                <div class="timer" id="timer">00:00</div>
+                <div class="text-lg font-bold text-blue-600">Score: <span id="score">0</span></div>
+                <div class="text-lg font-bold text-gray-700">Q<span id="questionNumber">1</span>/<span
+                        id="totalQuestions"></span></div>
+            </div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-bold mb-6 text-blue-600" id="question"></h2>
+            <div id="optionsContainer" class="space-y-4"></div>
+        </div>
+
+        <!-- Next Button -->
+        <button id="nextButton"
+            class="w-full max-w-md bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300 mt-6 hidden">Next</button>
+    </div>
+
+    <script>
+        let score = 0, correctAnswers = 0, wrongAnswers = 0;
+        let currentQuestionIndex = 0;
+        let startTime, endTime;
+
+        // Get quiz data from server
+        const quiz = <%- JSON.stringify(quiz) %>;
+        console.log(quiz);
+        const questions = quiz.questions;
+        const totalQuestions = questions.length;
+
+        // DOM Elements
+        document.getElementById('totalQuestions').textContent = totalQuestions;
+        const scoreElement = document.getElementById('score');
+        const questionNumberElement = document.getElementById('questionNumber');
+        const questionElement = document.getElementById('question');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const nextButton = document.getElementById('nextButton');
+        const timerElement = document.getElementById('timer');
+
+        function startQuiz() {
+            startTime = new Date();
+            updateQuestion();
+        }
+
+        function updateQuestion() {
+            if (currentQuestionIndex >= totalQuestions) {
+                endQuiz();
+                return;
+            }
+
+            const currentQuestion = questions[currentQuestionIndex];
+            questionElement.textContent = currentQuestion.question;
+            questionNumberElement.textContent = currentQuestionIndex + 1;
+
+            optionsContainer.innerHTML = "";
+            currentQuestion.options.forEach((option, index) => {
+                const optionDiv = document.createElement("div");
+                optionDiv.classList.add("option", "p-4", "border", "border-gray-200", "rounded-lg");
+                optionDiv.innerHTML = `<p class="text-lg">${String.fromCharCode(65 + index)}. ${option}</p>`;
+                optionDiv.onclick = () => checkAnswer(index, currentQuestion.ans, optionDiv);
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            nextButton.classList.add("hidden");
+            updateTimer();
+        }
+
+        function checkAnswer(selectedIndex, correctIndex, selectedOption) {
+            const allOptions = document.querySelectorAll(".option");
+
+            if (selectedIndex === correctIndex) {
+                selectedOption.classList.add("correct");
+                correctAnswers++;
+                score += 10;
+                scoreElement.textContent = score;
+                setTimeout(nextQuestion, 500);
+            } else {
+                selectedOption.classList.add("wrong");
+                wrongAnswers++;
+                allOptions[correctIndex].classList.add("correct");
+                nextButton.classList.remove("hidden");
+            }
+            allOptions.forEach(option => option.onclick = null);
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            updateQuestion();
+        }
+
+        function updateTimer() {
+            let now = new Date();
+            let elapsed = Math.floor((now - startTime) / 1000);
+            let minutes = Math.floor(elapsed / 60);
+            let seconds = elapsed % 60;
+            timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            setTimeout(updateTimer, 1000);
+        }
+
+        function endQuiz() {
+            endTime = new Date();
+            let totalTimeTaken = Math.floor((endTime - startTime) / 1000);
+
+            localStorage.setItem("quizResults", JSON.stringify({
+                quizId: quiz._id, 
+                score,
+                correctAnswers,
+                wrongAnswers,
+                totalTimeTaken
+            }));
+
+
+            window.location.href = `/quiz/${quiz._id}/result`;
+        }
+
+        startQuiz();
+        nextButton.addEventListener("click", nextQuestion);
+    </script>
+</body>
+
+</html>

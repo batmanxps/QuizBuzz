@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify User - QuizBuzz</title>
+    <link rel="stylesheet" href="/styles/output.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+</head>
+
+<body class="bg-gray-100 font-sans">
+    <div class="max-w-2xl mx-auto mt-6 p-4 bg-white rounded-lg shadow-md">
+        <div class="flex items-center justify-between pb-2 border-b border-gray-200">
+            <a href="/" class="text-blue-600 hover:text-blue-800">
+                <i class="ri-arrow-left-line text-2xl"></i>
+            </a>
+            <h2 class="text-lg font-semibold text-blue-600 text-center flex-grow">Verify User</h2>
+        </div>
+
+        <div class="overflow-hidden">
+            <table class="w-full mt-4 border-collapse">
+                <thead>
+                    <tr class="bg-blue-600 text-white text-left text-sm">
+                        <th class="p-3">Name</th>
+                        <th class="p-3">Email</th>
+                        <th class="p-3 text-center">Verify</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(user=> { %>
+                        <tr class="border-b hover:bg-blue-50">
+                            <td class="p-3 truncate max-w-[150px]">
+                                <%= user.fullName %>
+                            </td>
+                            <td class="p-3 truncate max-w-[200px]">
+                                <%= user.email %>
+                            </td>
+                            <td class="p-3 text-center">
+                                <button
+                                    class="verify-btn bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition"
+                                    data-id="<%= user._id %>">
+                                    <i class="ri-check-double-fill"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const verifyButtons = document.querySelectorAll(".verify-btn");
+
+            verifyButtons.forEach(button => {
+                button.addEventListener("click", async () => {
+                    const userId = button.getAttribute("data-id");
+
+                    if (confirm("Are you sure you want to verify this user?")) {
+                        try {
+                            const response = await fetch(`/admin/verify/${userId}`, { method: "POST" });
+
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+
+                            const data = await response.json();
+
+                            if (data.success) {
+                                alert("User verified successfully!");
+                                button.innerHTML = "<i class='ri-check-fill'></i> Verified";
+                                button.disabled = true;
+                                button.classList.add("bg-gray-400", "cursor-not-allowed");
+                            } else {
+                                alert("Error: " + data.message);
+                            }
+                        } catch (error) {
+                            console.error("Error verifying user:", error);
+                            alert("Failed to verify user.");
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

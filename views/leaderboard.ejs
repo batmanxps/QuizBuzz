@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard - QuizBuzz</title>
+    <link rel="stylesheet" href="/styles/output.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+</head>
+
+<body class="bg-gray-100 font-sans">
+    <div class="max-w-3xl mx-auto mt-6 p-4 bg-white rounded-lg shadow-md">
+        <div class="flex items-center justify-between pb-2 border-b border-gray-200">
+            <a href="/" class="text-blue-600 hover:text-blue-800">
+                <i class="ri-arrow-left-line text-2xl"></i>
+            </a>
+            <h2 class="text-lg font-semibold text-blue-600 text-center flex-grow">Leaderboard</h2>
+        </div>
+
+        <!-- Quiz Selection Dropdown -->
+        <select id="quizSelector"
+            class="mt-4 p-2 border rounded w-full bg-gray-100 text-gray-700 focus:ring focus:ring-blue-200">
+            <option value="">Select Quiz</option>
+        </select>
+
+        <!-- Responsive Table Container -->
+        <div class="overflow-hidden mt-4">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-blue-600 text-white text-sm">
+                        <th class="p-3">Rank</th>
+                        <th class="p-3">Name</th>
+                        <th class="p-3">Score</th>
+                        <th class="p-3">Correct</th>
+                        <th class="p-3">Time Taken</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const response = await fetch("/quizzes");
+                const data = await response.json();
+                const quizSelector = document.getElementById("quizSelector");
+
+                data.forEach(quiz => {
+                    const option = document.createElement("option");
+                    option.value = quiz._id;
+                    option.textContent = quiz.title;
+                    quizSelector.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Error fetching quizzes:", error);
+            }
+            console.log("Developed By Pushkar Ps")
+        });
+
+        document.getElementById("quizSelector").addEventListener("change", async function () {
+            const quizId = this.value;
+            if (!quizId) return;
+
+            try {
+                const response = await fetch(`/leaderboard/${quizId}`);
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+                const data = await response.json();
+                const tbody = document.querySelector(".w-full tbody");
+
+                // Clear previous leaderboard data before inserting new data
+                tbody.innerHTML = "";
+
+                if (data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center p-3 text-gray-500">No results available.</td></tr>`;
+                    return;
+                }
+
+                data.forEach((entry, index) => {
+                    const adminBadge = entry.isAdmin ? `<i class="ri-verified-badge-fill text-blue-500"></i>` : "";
+                    const topperBadge = entry.isTopper ? `<i class="ri-vip-crown-fill text-yellow-500"></i>` : "";
+
+                    const row = `
+                        <tr class="border-b hover:bg-blue-50">
+                            <td class="p-3 text-center">${index + 1}</td>
+                            <td class="p-3 flex items-center gap-2 truncate">
+                                ${topperBadge} <span>${entry.username}</span> ${adminBadge}
+                            </td>
+                            <td class="p-3 text-center">${entry.score}</td>
+                            <td class="p-3 text-center">${entry.correctAnswers}</td>
+                            <td class="p-3 text-center">${Math.floor(entry.timeTaken / 60)}:${String(entry.timeTaken % 60).padStart(2, '0')}</td>
+                        </tr>`;
+
+                    tbody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error("Error fetching leaderboard:", error);
+            }
+        });
+    </script>
+</body>
+
+</html>

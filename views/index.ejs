@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizBuzz - Home</title>
+  <link rel="stylesheet" href="/styles/output.css">
+  <link rel="shortcut icon"
+    href="https://media-bom2-2.cdn.whatsapp.net/v/t61.24694-24/473398010_1163809545457713_2171722800625625261_n.jpg?ccb=11-4&oh=01_Q5AaIaiqLVXj93FyqbrzRiEFt-VTk1budINPCZyJ1X5o756_&oe=67E781EA&_nc_sid=5e03e0&_nc_cat=109"
+    type="image/x-icon">
+  <style>
+    /* Custom styles for animations */
+    .blink {
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    /* Hover effects */
+    .test-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Blur effect for nav */
+    .nav-blur {
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Styled scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100">
+  <!-- Navigation Bar -->
+  <nav class="fixed top-0 left-0 w-full z-50 nav-blur shadow-sm">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <!-- Logo -->
+      <a href="https://adhyayan-classes.netlify.app/" class="flex items-center space-x-2 ">
+        <img src="https://media-bom2-2.cdn.whatsapp.net/v/t61.24694-24/328759618_478169478222632_103569350237823088_n.jpg?ccb=11-4&oh=01_Q5AaIeLpxd1s8E-SaghWmU-heid2CIu548Cnc2NL3LFB2qCG&oe=67E92CFE&_nc_sid=5e03e0&_nc_cat=109" alt="QuizBuzz Logo" class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full object-cover">
+      </a>
+      <!-- Navigation Links -->
+      <div class="flex space-x-6">
+        <a href="/<%= userUId.uid %>/Settings" class="text-blue-600 hover:text-blue-800 flex items-center space-x-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </a>
+        <a href="/leaderboard" class="text-blue-600 hover:text-blue-800 flex items-center space-x-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </nav>
+  <!-- Main Content -->
+  <div class="min-h-screen flex flex-col items-center justify-center p-4 pt-20">
+    <% if (userUId.isAdmin) {%> <button
+        class="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition duration-300 mb-4"
+        onclick="location.href='/admin/adminDashboard'">Admin Dashboard</button>
+      <% } %>
+        <!-- Live Test Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md mb-6">
+          <h2 class="text-xl font-bold mb-4 text-blue-600">Live Test</h2>
+          <% if (liveQuizzes.length> 0) { %>
+            <div class="space-y-4">
+              <% liveQuizzes.forEach(quiz=> { %>
+                <div
+                  class="test-card p-4 rounded-lg border border-gray-200 hover:border-blue-400 transition-all cursor-pointer"
+                  onclick="location.href='/test/<%= quiz._id %>'">
+                  <div class="flex items-center space-x-4">
+                    <div class="w-4 h-4 bg-green-500 rounded-full blink"></div>
+                    <p class="text-lg">
+                      <%= quiz.title %>
+                    </p>
+                  </div>
+                  <p class="text-sm text-gray-500 mt-2">
+                    Ends on <%= new Date(quiz.endTime).toLocaleString("en-US", { weekday: 'short' , year: 'numeric' ,
+                      month: 'short' , day: 'numeric' , hour: '2-digit' , minute: '2-digit' , hour12: true }) %>
+                  </p>
+                </div>
+                <% }); %>
+            </div>
+            <% } else { %>
+              <p class="text-gray-500">No live quizzes available right now.</p>
+              <% } %>
+        </div>
+
+        <!-- Scheduled Tests Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+          <h2 class="text-xl font-bold mb-4 text-blue-600">Scheduled Tests</h2>
+
+          <% if (scheduledQuizzes.length> 0) { %>
+            <div class="space-y-4">
+              <% scheduledQuizzes.forEach(quiz=> { %>
+                <div
+                  class="test-card p-4 rounded-lg border border-gray-200 hover:border-blue-400 transition-all cursor-pointer">
+                  <p class="text-lg">
+                    <%= quiz.title %>
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    Starts on <%= new Date(quiz.startTime).toLocaleString("en-US", { weekday: 'short' , year: 'numeric'
+                      , month: 'short' , day: 'numeric' , hour: '2-digit' , minute: '2-digit' , hour12: true }) %>
+                  </p>
+                </div>
+                <% }); %>
+            </div>
+            <% } else { %>
+              <p class="text-gray-500">No scheduled quizzes available.</p>
+              <% } %>
+        </div>
+
+
+        <!-- Previous Tests Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md mb-6">
+          <h2 class="text-xl font-bold mb-4 text-blue-600">Previous Tests</h2>
+
+          <% if (previousQuizzes.length> 0) { %>
+            <div class="space-y-4">
+              <% previousQuizzes.forEach(quiz=> { %>
+                <div
+                  class="test-card p-4 rounded-lg border border-gray-200 hover:border-blue-400 transition-all cursor-pointer"
+                  onclick="location.href='/test/<%= quiz._id %>'">
+                  <p class="text-lg">
+                    <%= quiz.title %>
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    Completed on <%= new Date(quiz.endTime).toLocaleDateString("en-US", { year: 'numeric' ,
+                      month: 'short' , day: 'numeric' }) %>
+                  </p>
+                </div>
+                <% }); %>
+            </div>
+            <% } else { %>
+              <p class="text-gray-500">No previous quizzes available.</p>
+              <% } %>
+        </div>
+  </div>
+  <script>
+    console.log("Developed By Pushkar Ps")
+  </script>
+</body>
+
+</html>

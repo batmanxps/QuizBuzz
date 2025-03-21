@@ -8,9 +8,16 @@ const cookie = require('cookie-parser');
 const flash = require('connect-flash');
 const axios = require("axios");
 const cron = require("node-cron");
+const moment = require("moment-timezone");
 
 let PORT = process.env.PORT || 5050
 db()
+
+process.env.TZ = "Asia/Kolkata";
+
+const nowIST = moment().tz("Asia/Kolkata").format();
+console.log("Current IST time:", nowIST);
+
 
 const authRoutes = require('./routes/authRoutes')
 const indexRoutes = require('./routes/indexRoutes')
@@ -38,7 +45,7 @@ app.use(session({
     }),
     cookie: {
         maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days (User stays logged in)
-        secure: false,  // Set to true if using HTTPS
+        secure: true,  // Set to true if using HTTPS
         httpOnly: true
     }
 }));

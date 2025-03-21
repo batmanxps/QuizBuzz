@@ -76,6 +76,9 @@ router.post("/add-quiz", async (req, res) => {
     try {
         const { title, questions, startTime, endTime } = req.body;
 
+        startTime = moment.tz(startTime, "Asia/Kolkata").utc().toISOString();
+        endTime = moment.tz(endTime, "Asia/Kolkata").utc().toISOString();
+
         await Quiz.create({
             title,
             questions,

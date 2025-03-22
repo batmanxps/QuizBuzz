@@ -10,7 +10,7 @@ router.get('/adminDashboard', (req, res) => {
 
 router.get('/deleteUser', async (req, res) => {
     try {
-        const users = await User.find({}, 'fullName email');
+        const users = await User.find({}, 'fullName email isAdmin');
         res.render('deleteUser', { users });
     } catch (error) {
         console.error("Error fetching users:", error);
@@ -47,21 +47,20 @@ router.get('/verifyUser', async (req, res) => {
 router.post('/verify/:userId', async (req, res) => {
     try {
         const userId = req.params.userId;
-        console.log(userId);
 
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            { isVerify: true },
-            { new: true }
-        );
-
-        if (!updatedUser) {
+        // Find the user first
+        const user = await User.findById(userId);
+        if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        res.json({ success: true, message: "User verified successfully!" });
+        // Toggle isTopper value (switch between true & false)
+        user.isTopper = !user.isTopper;
+        await user.save();
+
+        res.json({ success: true, isTopper: user.isTopper });
     } catch (error) {
-        console.error("Error verifying user:", error);
+        console.error("Error toggling user verification:", error);
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 });
@@ -75,7 +74,7 @@ router.get('/add-test', (req, res) => {
 
 router.post("/add-quiz", async (req, res) => {
     try {
-        const { title, questions, startTime, endTime } = req.body;
+        let { title, questions, startTime, endTime } = req.body;
 
         startTime = moment.tz(startTime, "Asia/Kolkata").utc().toISOString();
         endTime = moment.tz(endTime, "Asia/Kolkata").utc().toISOString();
@@ -94,6 +93,7 @@ router.post("/add-quiz", async (req, res) => {
         res.status(500).json({ error: "Error adding quiz" });
     }
 });
+
 
 router.get('/delete-test', async (req, res) => {
     const now = new Date();

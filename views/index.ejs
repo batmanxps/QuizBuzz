@@ -60,7 +60,7 @@
   </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 select-none">
   <!-- Navigation Bar -->
   <nav class="fixed top-0 left-0 w-full z-50 nav-blur shadow-sm">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -88,9 +88,9 @@
     </div>
   </nav>
   <!-- Main Content -->
-  <div class="min-h-screen flex flex-col items-center justify-center p-4 pt-20">
+  <div class="min-h-screen flex flex-col items-center justify-center p-4 pt-20 select-none">
     <% if (userUId.isAdmin) {%> <button
-        class="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition duration-300 mb-4"
+        class="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition duration-300 mb-4 select-none"
         onclick="location.href='/admin/adminDashboard'">Admin Dashboard</button>
       <% } %>
         <!-- Live Test Section -->

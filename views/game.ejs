@@ -38,7 +38,7 @@
     </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 select-none">
     <!-- Game Container -->
     <div class="min-h-screen flex flex-col items-center justify-center p-4">
         <!-- Header -->
@@ -153,7 +153,6 @@
                 wrongAnswers,
                 totalTimeTaken
             }));
-
 
             window.location.href = `/quiz/${quiz._id}/result`;
         }

@@ -38,9 +38,11 @@
                             </td>
                             <td class="p-3 text-center">
                                 <button
-                                    class="verify-btn bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition"
-                                    data-id="<%= user._id %>">
-                                    <i class="ri-check-double-fill"></i>
+                                    class="verify-btn px-3 py-1 rounded text-sm transition
+                                    <%= user.isTopper ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-700' %>"
+                                    data-id="<%= user._id %>" <%=user.isTopper ? 'disabled' : '' %>>
+                                    <i class="<%= user.isTopper ? 'ri-check-fill' : 'ri-check-double-fill' %>"></i>
+                                    <%= user.isTopper ? 'Verified' : 'Verify' %>
                                 </button>
                             </td>
                         </tr>
@@ -58,28 +60,35 @@
                 button.addEventListener("click", async () => {
                     const userId = button.getAttribute("data-id");
 
-                    if (confirm("Are you sure you want to verify this user?")) {
-                        try {
-                            const response = await fetch(`/admin/verify/${userId}`, { method: "POST" });
+                    try {
+                        const response = await fetch(`/admin/verify/${userId}`, { method: "POST" });
 
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! Status: ${response.status}`);
-                            }
-
-                            const data = await response.json();
-
-                            if (data.success) {
-                                alert("User verified successfully!");
-                                button.innerHTML = "<i class='ri-check-fill'></i> Verified";
-                                button.disabled = true;
-                                button.classList.add("bg-gray-400", "cursor-not-allowed");
-                            } else {
-                                alert("Error: " + data.message);
-                            }
-                        } catch (error) {
-                            console.error("Error verifying user:", error);
-                            alert("Failed to verify user.");
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
                         }
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            // Update button text and styles dynamically
+                            button.innerHTML = data.isTopper
+                                ? "<i class='ri-check-fill'></i> Verified"
+                                : "<i class='ri-check-double-fill'></i> Verify";
+
+                            button.classList.toggle("bg-gray-400", data.isTopper);
+                            button.classList.toggle("cursor-not-allowed", data.isTopper);
+                            button.classList.toggle("bg-blue-500", !data.isTopper);
+                            button.classList.toggle("text-white", !data.isTopper);
+                            button.classList.toggle("hover:bg-blue-700", !data.isTopper);
+
+                            // Disable the button if verified
+                            button.disabled = data.isTopper;
+                        } else {
+                            alert("Error: " + data.message);
+                        }
+                    } catch (error) {
+                        console.error("Error toggling user verification:", error);
+                        alert("Failed to toggle verification.");
                     }
                 });
             });

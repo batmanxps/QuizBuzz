@@ -28,9 +28,11 @@ router.get('/', ensureAuthenticated, async (req, res) => {
             endTime: { $gt: now }
         });
 
+
         const scheduledQuizzes = await Quiz.find({
             startTime: { $gt: now } // Upcoming quizzes
         });
+
 
         const previousQuizzes = await Quiz.find({
             endTime: { $lt: now } // Completed quizzes

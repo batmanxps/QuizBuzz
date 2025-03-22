@@ -14,9 +14,7 @@ let PORT = process.env.PORT || 5050
 db()
 
 process.env.TZ = "Asia/Kolkata";
-
-const nowIST = moment().tz("Asia/Kolkata").format();
-console.log("Current IST time:", nowIST);
+moment().tz("Asia/Kolkata").format();
 
 
 const authRoutes = require('./routes/authRoutes')
@@ -80,17 +78,22 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: "Server error, please try again later" });
 });
 
-app.get('/ping', (req, res) => {
-    res.status(200).send("Server is alive! 🚀");
+const SERVER_URL = process.env.SERVER_URL || "http://localhost:3000";
+
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: "Server is running", time: new Date() });
 });
 
 cron.schedule("*/14 * * * *", async () => {
     try {
-        await axios.get("https://auraquiz-3d4i.onrender.com/auth/ping");
+        console.log(`Pinging ${SERVER_URL}/health`);
+        const response = await axios.get(`${SERVER_URL}/health`);
+        console.log("✅ Server keep-alive response:", response.data);
     } catch (error) {
-        console.error("Error keeping server alive:", error.message);
+        console.error("❌ Error keeping server alive:", error.message);
     }
 });
+
 
 app.listen(PORT, () => {
     console.log(`Server listen on ${PORT}`);

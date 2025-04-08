@@ -32,7 +32,6 @@
 </head>
 
 <body class="flex items-center justify-center min-h-screen">
-    <!-- Sign-Up Page -->
     <div class="bg-white p-8 rounded-lg shadow-md w-96 text-center">
         <!-- Header -->
         <h1 class="text-3xl font-bold mb-1">QuizBuzz</h1>
@@ -91,10 +90,16 @@
                     <div class="mb-4">
                         <label class="flex items-center">
                             <input type="checkbox" id="terms" class="mr-2">
-                            <span class="text-sm">I have read the rules of <a href="https://adhyayan-classes.netlify.app/" class="text-blue-700">Adhyayan Classes</a> </span>
+                            <span class="text-sm">I have read the rules of <a
+                                    href="https://adhyayan-classes.netlify.app/" class="text-blue-700">Adhyayan
+                                    Classes</a> </span>
                         </label>
                         <p id="termError" class="text-red-500 text-sm mt-1 hidden">Please accept the terms and
                             conditions</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="g-recaptcha" data-sitekey="6LfGrA0rAAAAAKjTyvhHWnT7MPNlgjdmCUDyxEa6"></div>
                     </div>
 
                     <!-- Sign-Up Button -->
@@ -107,7 +112,7 @@
                 <p class="text-gray-600 mt-4">Already have an account? <a href="/auth/login"
                         class="text-blue-500">Login</a></p>
     </div>
-
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script>
         // JavaScript for See Password Functionality
         function togglePasswordVisibility(inputId, toggleId) {
@@ -164,6 +169,8 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const terms = document.getElementById('terms').checked;
+            const captchaResponse = grecaptcha.getResponse();
+
 
             // Validation
             let formIsValid = true;
@@ -194,6 +201,11 @@
                 formIsValid = false;
             } else {
                 document.getElementById('passwordError').classList.add('hidden');
+            }
+
+            if (!captchaResponse) {
+                alert("Please complete the reCAPTCHA.");
+                formIsValid = false;
             }
 
             if (!terms) {

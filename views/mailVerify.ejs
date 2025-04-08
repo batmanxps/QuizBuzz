@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Email - QuizBuzz</title>
+  <link rel="stylesheet" href="/styles/output.css">
+  <style>
+    body {
+      background-color: #fafafa;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    input:focus {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+      outline: none;
+    }
+
+    footer {
+      text-align: center;
+      width: 100%;
+      padding: 10px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="bg-white p-8 rounded-lg shadow-md w-96 text-center">
+      <h1 class="text-3xl font-bold mb-1">QuizBuzz</h1>
+      <p class="text-gray-500 text-sm mb-6">Email Verification</p>
+
+      <% if (messages.error && messages.error.length> 0) { %>
+        <div class="bg-red-500/20 border border-red-500 text-red-500 p-2 rounded-lg text-sm m-2">
+          <%= messages.error %>
+        </div>
+        <% } %>
+
+          <% if (messages.success && messages.success.length> 0) { %>
+            <div class="bg-green-500/20 border border-green-500 text-green-500 p-2 rounded-lg text-sm m-2">
+              <%= messages.success %>
+            </div>
+            <% } %>
+
+              <% if (email) { %>
+                <p class="text-gray-700 text-sm mb-4">
+                  A verification email has been sent to <strong>
+                    <%= email %>
+                  </strong>.<br>
+                  Please check your inbox and click the link to verify.
+                </p>
+                <% } %>
+
+                  <form method="POST" action="/auth/verify">
+                    <input type="hidden" name="email" value="<%= email %>">
+                    <button type="submit"
+                      class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300">
+                      Resend Email
+                    </button>
+                  </form>
+
+                  <p class="text-gray-600 mt-4">
+                    Already verified? <a href="/auth/login" class="text-blue-500">Login here</a>
+                  </p>
+    </div>
+  </div>
+
+  <footer onclick="location.href='https://www.instagram.com/pushkar_ps_/'" class="text-gray-500 text-sm">
+    Developed by <span class="font-bold text-blue-600">Pushkar Ps</span>
+  </footer>
+
+  <script>
+    const form = document.getElementById('verifyEmailForm');
+    form.addEventListener('submit', (e) => {
+      const email = document.getElementById('verifyEmail').value;
+      document.getElementById('verifyEmailError').classList.add('hidden');
+
+      if (!email) {
+        e.preventDefault();
+        document.getElementById('verifyEmailError').classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+
+</html>

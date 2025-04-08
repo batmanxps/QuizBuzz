@@ -12,22 +12,24 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "axios": "^1.8.3",
+    "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
-    "express": "^4.21.2",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
     "express-session": "^1.18.1",
     "jsonwebtoken": "^9.0.2",
-    "moment-timezone": "^0.5.47",
-    "mongoose": "^8.12.1",
+    "moment-timezone": "^0.5.48",
+    "mongoose": "^8.13.2",
     "node-cron": "^3.0.3",
+    "nodemailer": "^6.10.0",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^4.1.3"
   }
 }

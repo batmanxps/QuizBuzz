@@ -22,16 +22,9 @@ const indexRoutes = require('./routes/indexRoutes')
 const adminRoutes = require('./routes/adminRoutes')
 const isAuthenticated = require('./middleware/isAuthenticated')
 const { ensureAuthenticated, ensureAdmin } = require('./middleware/isAdmin')
-
-app.use(flash());
-app.use(cookie());
-app.set('view engine', 'ejs')
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(path.join(__dirname, 'public')));
-
 const MongoStore = require("connect-mongo");
+
+app.use(cookie());
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -42,15 +35,28 @@ app.use(session({
         collectionName: "sessions"
     }),
     cookie: {
-        maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days (User stays logged in)
-        secure: true,  // Set to true if using HTTPS
+        maxAge: 15 * 24 * 60 * 60 * 1000,
+        secure: true,
         httpOnly: true
     }
 }));
 
+app.use(flash());
+app.set('view engine', 'ejs')
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+
+app.use((req, res, next) => {
+    res.locals.messages = req.flash();
+    next();
+});
+
 process.on("uncaughtException", (err) => {
     console.error("Uncaught Exception:", err);
-    process.exit(1); 
+    process.exit(1);
 });
 
 process.on("unhandledRejection", (reason, promise) => {
@@ -67,7 +73,7 @@ app.use((req, res) => {
 });
 
 app.use((req, res, next) => {
-    req.setTimeout(15000, () => { 
+    req.setTimeout(15000, () => {
         res.status(408).send("Request Timeout");
     });
     next();
@@ -88,7 +94,7 @@ cron.schedule("*/14 * * * *", async () => {
     try {
         console.log(`Pinging ${SERVER_URL}/health`);
         const response = await axios.get(`${SERVER_URL}/health`);
-        console.log("✅ Server keep-alive response:", response.data);
+        console.log("✅ Server keep-alive response");
     } catch (error) {
         console.error("❌ Error keeping server alive:", error.message);
     }

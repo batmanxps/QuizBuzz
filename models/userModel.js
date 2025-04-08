@@ -34,6 +34,7 @@ const userSchema = new mongoose.Schema(
             default: false,
         },
         uid: String,
+        isVerified: { type: Boolean, default: false },
     },
     {
         timestamps: true,

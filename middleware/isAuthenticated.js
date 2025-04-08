@@ -17,8 +17,19 @@ const isAuthenticated = async (req, res, next) => {
             return res.redirect('/auth/login');
         }
 
+        // Optionally: store user in req.user for later use
         req.user = user;
-        next();
+
+        // ✅ Check if session exists, otherwise create it
+        if (!req.session.user) {
+            req.session.user = {
+                id: user._id,
+                email: user.email,
+                username: user.username
+            };
+        }
+
+        next(); // ✅ Only one call to next
     } catch (error) {
         console.error("Authentication error:", error);
         res.clearCookie("token");
